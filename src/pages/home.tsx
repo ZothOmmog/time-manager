@@ -1,10 +1,11 @@
 import React from 'react';
+import { DiaryTable } from '../components/diary-table';
 import { PageTemplate } from "../components/page-template";
 
 export const Home: React.FC<unknown> = () => {
     return (
         <PageTemplate>
-            Главная
+            <DiaryTable />
         </PageTemplate>
     );
 }
