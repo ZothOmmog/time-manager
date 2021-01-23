@@ -1,6 +1,6 @@
 import React from "react";
-import { Home } from "./pages/home";
+import { Routes } from "./pages/routes";
 
 export const App: React.FC = () => {
-  return <Home />;
+  return <Routes />;
 };
