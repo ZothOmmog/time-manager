@@ -24,7 +24,7 @@ export const DiaryTable = () => {
         <VirtualTable
             columns={columns}
             dataSource={diaryItemsView}
-            tableHeight='calc(100vh - 213px)'
+            tableHeight='calc(100vh - 267px)'
             initialScroll='bottom'
             rowClassName={styles['row']}
             cellStyle={{ border: '1px solid #f0f0f0', padding: 5 }}
