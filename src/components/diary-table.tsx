@@ -9,11 +9,11 @@ export const DiaryTable = () => {
     const diaryItemsView = useStore($diaryItemView);
 
     const columns = useMemo<ColumnsType<IDiaryItemView>>(() => [
-        { title: 'Дата', dataIndex: 'date', width: 100 },
-        { title: 'Номер таска', dataIndex: 'keyTask', width: 120 },
-        { title: 'Время начала', dataIndex: 'timeStart', width: 150 },
-        { title: 'Время конца', dataIndex: 'timeEnd', width: 150 },
-        { title: 'Продолжительность', dataIndex: 'duration', width: 180 },
+        { title: 'Дата', dataIndex: 'date', width: 100, align: 'right' },
+        { title: 'Номер таска', dataIndex: 'keyTask', width: 120, align: 'right' },
+        { title: 'Время начала', dataIndex: 'timeStart', width: 150, align: 'right' },
+        { title: 'Время конца', dataIndex: 'timeEnd', width: 150, align: 'right' },
+        { title: 'Продолжительность', dataIndex: 'duration', width: 180, align: 'right' },
         { title: 'Описание', dataIndex: 'desctiption' }
     ], []);
 
@@ -21,9 +21,8 @@ export const DiaryTable = () => {
         <VirtualTable
             columns={columns}
             dataSource={diaryItemsView}
-            scroll={{ y: 600 }}
             tableHeight='calc(100vh - 213px)'
-            cellStyle={{ border: '1px solid #f0f0f0' }}
+            cellStyle={{ border: '1px solid #f0f0f0', padding: 5 }}
         />
     );
 };
