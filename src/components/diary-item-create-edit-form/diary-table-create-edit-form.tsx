@@ -175,10 +175,21 @@ interface IFormInputTextareaProps extends Omit<React.ComponentProps<typeof Input
 
 function FormInputTextarea(props: IFormInputTextareaProps) {
     const { onChange, errorText, hasError, ...otherProps } = props;
+
+    let errorStyle: React.CSSProperties;
+
+    if (otherProps.showCount) {
+        errorStyle = {
+            position: 'relative',
+            top: -22
+        };
+    }
+    else errorStyle = {};
+
     return (
         <div style={{ height: 54 }} className={hasError ? 'ant-form-item-has-error' : ''}>
             <Input.TextArea {...otherProps} onChange={(e) => onChange(e.target.value)} />
-            <Text type='danger'>
+            <Text type='danger' style={errorStyle} >
                 {props.errorText}
             </Text>
         </div>
