@@ -1,20 +1,16 @@
 import { addHours, startOfDay, startOfMinute } from "date-fns";
 import { forward, guard, sample } from "effector";
-import { $diaryItemView } from "../diary/diary-model";
-import { $visibleType, createEditForm, visibleChange } from "./diary-item-create-edit-form-model";
+import { $diaryItemView, addDiaryItemFx } from "../diary/diary-model";
+import { $visibleType, createEditForm, hide, visibleChange } from "./diary-item-create-edit-form-model";
 
 $visibleType.on(visibleChange, (_, visible) => visible);
+$visibleType.on(hide, () => '');
 
 visibleChange.watch(value => console.log(value))
 
 const visibleCreate = guard({
     source: visibleChange,
     filter: (visibleType) => visibleType === 'create'
-});
-
-const hide = guard({
-    source: visibleChange,
-    filter: visibleType => visibleType === ''
 });
 
 forward({
@@ -51,5 +47,16 @@ sample({
         };
     }
 })
+
+sample({
+    source: createEditForm.formValidated,
+    target: addDiaryItemFx,
+    fn: ({ description, endTime, keyTask, startTime }) => ({
+        desctiption: description,
+        keyTask: Number(keyTask),
+        timeEnd: endTime,
+        timeStart: startTime
+    })
+});
 
 createEditForm.formValidated.watch((values) => console.log(values));

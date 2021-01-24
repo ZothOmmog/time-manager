@@ -48,6 +48,7 @@ export const createEditForm = createForm({
 });
 
 export const visibleChange = createEvent<'create' | 'edit' | ''>();
+export const hide = createEvent();
 
 export const $visibleType = createStore<'create' | 'edit' | ''>('');
 export const $isVisible = $visibleType.map(state => Boolean(state));
