@@ -56,7 +56,7 @@ export const VirtualTable: IVirtualTable = (props) => {
     const renderVirtualList = (rawData: object[], { scrollbarSize, ref, onScroll }: any) => {
         ref.current = connectObject;
         const totalHeight = rawData.length * 100;
-        console.log(rawData)
+
         return (
             <Grid
                 ref={gridRef}
@@ -103,7 +103,6 @@ export const VirtualTable: IVirtualTable = (props) => {
             onResize={(args) => {
                 setTableWidth(args.width);
                 setTableHeight(args.height);
-                console.log(args);
             }}
         >
             <Table
