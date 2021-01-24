@@ -11,8 +11,9 @@ export const diaryItemToView = (diaryItem: IDiaryItem): IDiaryItemView => ({
     dateTimestamp: new Date(startOfDay(new Date(diaryItem.timeEnd))).getTime(),
     keyTask: diaryItem.keyTask,
     timeStart: timeFormatter(diaryItem.timeStart),
-    timeStartTimestamp: new Date(new Date(diaryItem.timeStart)).getTime(),
+    timeStartTimestamp: new Date(diaryItem.timeStart).getTime(),
     timeEnd: timeFormatter(diaryItem.timeEnd),
+    timeEndTimestamp: new Date(diaryItem.timeEnd).getTime(),
     duration: minutesToStr(
         differenceInMinutes(
             new Date(diaryItem.timeEnd),

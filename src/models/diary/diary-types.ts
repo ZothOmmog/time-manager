@@ -22,6 +22,8 @@ export interface IDiaryItemView extends IDiaryItem {
     timeStartTimestamp: number,
     /** Формат: чч:мм */
     timeEnd: string,
+    /** таймстамп даты и времени конца для сортировки и фильтрации */
+    timeEndTimestamp: number,
     /** Формат: [чч]:мм */
     duration: string
 }

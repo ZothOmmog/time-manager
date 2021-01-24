@@ -11,6 +11,38 @@ export const createEditForm = createForm({
                 rules.required(),
                 rules.number()
             ]
+        },
+        startTime: {
+            init: '0',
+            rules: [
+                rules.required(),
+                {
+                    name: 'timePairStart',
+                    validator: (startTime, { endTime }) => {
+                        return new Date(startTime).getTime() <= new Date(endTime).getTime();
+                    },
+                    errorText: 'Время начала не может быть больше времени конца'
+                }
+            ]
+        },
+        endTime: {
+            init: '0',
+            rules: [
+                rules.required(),
+                {
+                    name: 'timePairEnd',
+                    validator: (endTime, { startTime }) => {
+                        return new Date(startTime).getTime() <= new Date(endTime).getTime();
+                    },
+                    errorText: 'Время конца не может быть меньше времени начала'
+                }
+            ]
+        },
+        description: {
+            init: '',
+            rules: [
+                rules.required()
+            ]
         }
     }
 });
