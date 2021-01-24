@@ -54,7 +54,7 @@ const getAll = async () => {
     });
 }
 
-export const dalyTableApi = {
+export const diaryApi = {
     addTask,
     getAll,
     updateTask

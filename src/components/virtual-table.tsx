@@ -4,6 +4,8 @@ import ResizeObserver from 'rc-resize-observer';
 import { Table } from 'antd';
 import { ColumnsType, TableProps } from 'antd/lib/table';
 
+const ROW_HEIGHT = 54;
+
 interface IVirtualTableProps<RecordType> extends TableProps<RecordType> {
     cellStyle?: React.CSSProperties,
     tableHeight: number | string
@@ -17,6 +19,7 @@ export const VirtualTable: IVirtualTable = (props) => {
     const [tableWidth, setTableWidth] = useState(0);
     const [tableHeight, setTableHeight] = useState(0);
 
+    const columnWidthConstantSum = columns!.reduce((sum, { width }) => width ? sum + (width as number) : sum, 0);
     const widthColumnCount = columns!.filter(({ width }) => !width).length;
     const mergedColumns = columns!.map((column) => {
         if (column.width) {
@@ -25,7 +28,7 @@ export const VirtualTable: IVirtualTable = (props) => {
 
         return {
             ...column,
-            width: Math.floor(tableWidth / widthColumnCount),
+            width: Math.floor((tableWidth - columnWidthConstantSum) / widthColumnCount),
         };
     });
 
@@ -55,7 +58,7 @@ export const VirtualTable: IVirtualTable = (props) => {
 
     const renderVirtualList = (rawData: object[], { scrollbarSize, ref, onScroll }: any) => {
         ref.current = connectObject;
-        const totalHeight = rawData.length * 100;
+        const totalHeight = rawData.length * ROW_HEIGHT;
 
         return (
             <Grid
@@ -65,11 +68,11 @@ export const VirtualTable: IVirtualTable = (props) => {
                 columnWidth={(index: number) => {
                     const { width } = mergedColumns[index];
                     return totalHeight > scroll!.y! && index === mergedColumns.length - 1
-                        ? (width as number) - scrollbarSize - 1
+                        ? (width as number) - scrollbarSize
                         : (width as number);
                 }}
                 rowCount={rawData.length}
-                rowHeight={() => 100}
+                rowHeight={() => ROW_HEIGHT}
                 width={tableWidth}
                 height={tableHeight}
                 onScroll={({ scrollLeft }: { scrollLeft: number }) => {
