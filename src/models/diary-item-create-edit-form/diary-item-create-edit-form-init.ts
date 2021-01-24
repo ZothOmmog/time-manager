@@ -47,7 +47,7 @@ sample({
             keyTask: diaryItemLatest.keyTask.toString(),
             startTime,
             endTime,
-            description: ''
+            description: 'Продолжил работу'
         };
     }
 })

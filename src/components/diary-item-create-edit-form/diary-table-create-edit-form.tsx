@@ -51,10 +51,10 @@ export const DiaryItemCreateEditForm = () => {
         >
             <Row gutter={[16, 16]}>
                 <Col span={24}><KeyTaskInput /></Col>
-                <Col span={12}><StartTimeInput /></Col>
-                <Col span={12}><EndTimeInput /></Col>
-                <Col span={24}></Col>
+                <Col span={12}>Время начала действия: <StartTimeInput /></Col>
+                <Col span={12}>Время конца действия:<EndTimeInput /></Col>
             </Row>
+            Описание:
             <DescriptionInput />
         </Modal>
     )
@@ -80,7 +80,7 @@ function StartTimeInput() {
     return (
         <FormInputTimePicker
             format='HH:mm'
-            placeholder='Начало'
+            placeholder='ЧЧ:ММ'
             errorText={errorText()}
             hasError={hasError()}
             value={value}
@@ -95,7 +95,7 @@ function EndTimeInput() {
     return (
         <FormInputTimePicker
             format='HH:mm'
-            placeholder='Конец'
+            placeholder='ЧЧ:ММ'
             errorText={errorText()}
             hasError={hasError()}
             value={value}
@@ -114,8 +114,8 @@ function DescriptionInput() {
                 maxRows: 5
             }}
             showCount
+            allowClear
             maxLength={320}
-            placeholder='Описание'
             errorText={errorText()}
             hasError={hasError()}
             value={value}
