@@ -13,13 +13,14 @@ interface IVirtualTableProps<RecordType> extends TableProps<RecordType> {
     rowClassName?: string,
     tableHeight: number | string,
     columns: ColumnsType<RecordType>,
-    initialScroll?: ScrollType
+    initialScroll?: ScrollType,
+    scrollToItemReceiver?: (scrollToItem: List['scrollToItem']) => void
 }
 
 type IVirtualTable = <RecordType extends object = any>(props: IVirtualTableProps<RecordType>) => JSX.Element;
 
 export const VirtualTable: IVirtualTable = (props) => {
-    const { columns, initialScroll = 'top', cellStyle, tableHeight, style, rowClassName, ...otherProps } = props;
+    const { columns, initialScroll = 'top', cellStyle, tableHeight, style, rowClassName, scrollToItemReceiver, ...otherProps } = props;
     const [tableWidthAbs, setTableWidthAbs] = useState(0);
     const [tableHeightAbs, setTableHeightAbs] = useState(0);
 
@@ -55,6 +56,7 @@ export const VirtualTable: IVirtualTable = (props) => {
                     body: (rawData, { scrollbarSize }) => (
                         tableHeightAbs > 0 ? (
                             <CustomBody
+                                scrollToItemReceiver={scrollToItemReceiver}
                                 columns={mergedColumns}
                                 cellStyle={props.cellStyle}
                                 rawData={rawData}
@@ -80,6 +82,7 @@ interface ICustomBodyProps<RecordType> {
     tableWidth: number,
     cellStyle?: React.CSSProperties,
     rowClassName?: string,
+    scrollToItemReceiver?: (scrollToItem: List['scrollToItem']) => void,
     initialScroll: ScrollType
 }
 
@@ -91,7 +94,8 @@ function CustomBody<RecordType extends object = any>({
     tableWidth,
     cellStyle,
     initialScroll,
-    rowClassName
+    rowClassName,
+    scrollToItemReceiver
 }: ICustomBodyProps<RecordType>) {
     const totalHeight = rawData.length * ROW_HEIGHT;
     const [isInitScroll, setIsInitScroll] = useState(false);
@@ -110,6 +114,12 @@ function CustomBody<RecordType extends object = any>({
             setIsInitScroll(true);
         };
     }, [rawData.length, isInitScroll, initialScroll]);
+
+    useEffect(() => {
+        if (scrollToItemReceiver && ListRef.current) {
+            scrollToItemReceiver(ListRef.current.scrollToItem.bind(ListRef.current));
+        }
+    }, [scrollToItemReceiver]);
 
     const columnNormalizeWidth = useMemo<ColumnsType<RecordType>>(() => {
         return columns.map((column, index, columns) => {
