@@ -6,18 +6,21 @@ import { ColumnsType, ColumnType, TableProps } from 'antd/lib/table';
 
 const ROW_HEIGHT = 54;
 
+type ScrollType = 'top' | 'bottom';
+
 interface IVirtualTableProps<RecordType> extends TableProps<RecordType> {
     cellStyle?: React.CSSProperties,
-    tableHeight: number | string
-    columns: ColumnsType<RecordType>
+    tableHeight: number | string,
+    columns: ColumnsType<RecordType>,
+    initialScroll?: ScrollType
 }
 
 type IVirtualTable = <RecordType extends object = any>(props: IVirtualTableProps<RecordType>) => JSX.Element;
 
 export const VirtualTable: IVirtualTable = (props) => {
-    const { columns } = props;
-    const [tableWidth, setTableWidth] = useState(0);
-    const [tableHeight, setTableHeight] = useState(0);
+    const { columns, initialScroll = 'top', cellStyle, tableHeight, style, ...otherProps } = props;
+    const [tableWidthAbs, setTableWidthAbs] = useState(0);
+    const [tableHeightAbs, setTableHeightAbs] = useState(0);
 
     const columnWidthConstantSum = columns.reduce((sum, { width }) => width ? sum + (width as number) : sum, 0);
     const widthColumnCount = columns.filter(({ width }) => !width).length;
@@ -28,36 +31,38 @@ export const VirtualTable: IVirtualTable = (props) => {
 
         return {
             ...column,
-            width: Math.floor((tableWidth - columnWidthConstantSum) / widthColumnCount),
+            width: Math.floor((tableWidthAbs - columnWidthConstantSum) / widthColumnCount),
         };
     });
 
     return (
         <ResizeObserver
             onResize={(args) => {
-                setTableWidth(args.width);
-                setTableHeight(args.height);
+                setTableWidthAbs(args.width);
+                setTableHeightAbs(args.height);
             }}
         >
             <Table
-                {...props}
-                scroll={{ y: tableHeight }}
-                style={{ height: props.tableHeight }}
+                {...otherProps}
+                style={{ ...style, height: tableHeight }}
+                scroll={{ y: tableHeightAbs }}
                 bordered
                 className='virtual-table'
                 columns={mergedColumns}
                 pagination={false}
                 components={{
-                    body: (rawData, { scrollbarSize, onScroll }) => (
-                        <CustomBody
-                            columns={mergedColumns}
-                            cellStyle={props.cellStyle}
-                            onScroll={onScroll}
-                            rawData={rawData}
-                            scrollbarSize={scrollbarSize}
-                            tableHeight={tableHeight}
-                            tableWidth={tableWidth}
-                        />
+                    body: (rawData, { scrollbarSize }) => (
+                        tableHeightAbs > 0 ? (
+                            <CustomBody
+                                columns={mergedColumns}
+                                cellStyle={props.cellStyle}
+                                rawData={rawData}
+                                scrollbarSize={scrollbarSize}
+                                tableHeight={tableHeightAbs}
+                                tableWidth={tableWidthAbs}
+                                initialScroll={initialScroll}
+                            />
+                        ) : null
                     )
                 }}
             />
@@ -69,28 +74,38 @@ interface ICustomBodyProps<RecordType> {
     columns: ColumnsType<RecordType>,
     rawData: RecordType[],
     scrollbarSize: number,
-    onScroll: any,
     tableHeight: number,
     tableWidth: number,
-    cellStyle?: React.CSSProperties
+    cellStyle?: React.CSSProperties,
+    initialScroll: ScrollType
 }
 
 function CustomBody<RecordType extends object = any>({
     columns,
-    onScroll,
     rawData,
     scrollbarSize,
     tableHeight,
     tableWidth,
-    cellStyle
+    cellStyle,
+    initialScroll
 }: ICustomBodyProps<RecordType>) {
     const totalHeight = rawData.length * ROW_HEIGHT;
+    const [isInitScroll, setIsInitScroll] = useState(false);
 
-    const gridRef = useRef<List>(null);
+    const ListRef = useRef<List>(null);
 
     useEffect(() => {
-        gridRef.current?.resetAfterIndex(0, false);
+        ListRef.current?.resetAfterIndex(0, false);
     }, [tableWidth, tableHeight]);
+    
+    useEffect(() => {
+        if (!isInitScroll && rawData.length > 0 ) {
+            if (initialScroll === 'bottom') {
+                ListRef.current?.scrollToItem(rawData.length - 1);
+            }
+            setIsInitScroll(true);
+        };
+    }, [rawData.length, isInitScroll, initialScroll]);
 
     const columnNormalizeWidth = useMemo<ColumnsType<RecordType>>(() => {
         return columns.map((column, index, columns) => {
@@ -104,7 +119,8 @@ function CustomBody<RecordType extends object = any>({
 
     return (
         <List
-            ref={gridRef}
+            style={{ display: isInitScroll ? 'block' : 'none' }}
+            ref={ListRef}
             itemCount={rawData.length}
             itemSize={() => ROW_HEIGHT}
             width={tableWidth}
@@ -136,6 +152,7 @@ function CustomRecord<RecordType>({ record, columns, recordStyle, cellStyle }: I
         <div style={{...recordStyle, display: 'flex'}} key={Object.getOwnPropertyDescriptor(record, 'key')?.value}>
             {recordKeys.map(key => (
                 <CustomCell
+                    key={key}
                     cellData={Object.getOwnPropertyDescriptor(record, key)?.value as React.ReactNode}
                     cellStyle={cellStyle}
                     columnInfo={(columns as ColumnType<RecordType>[]).find(column => column.dataIndex === key)!}

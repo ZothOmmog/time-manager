@@ -22,6 +22,7 @@ export const DiaryTable = () => {
             columns={columns}
             dataSource={diaryItemsView}
             tableHeight='calc(100vh - 213px)'
+            initialScroll='bottom'
             cellStyle={{ border: '1px solid #f0f0f0', padding: 5 }}
         />
     );
