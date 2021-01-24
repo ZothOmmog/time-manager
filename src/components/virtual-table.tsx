@@ -45,7 +45,7 @@ export const VirtualTable: IVirtualTable = (props) => {
     });
 
     const resetVirtualGrid = () => {
-        gridRef.current.resetAfterIndices({
+        gridRef.current?.resetAfterIndices({
             columnIndex: 0,
             shouldForceUpdate: false,
         });
