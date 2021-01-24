@@ -9,7 +9,9 @@ export const DiaryTable = () => {
     const diaryItemsView = useStore($diaryItemView);
 
     const columns = useMemo<ColumnsType<IDiaryItemView>>(() => [
-        { title: 'Дата', dataIndex: 'date', width: 100, align: 'right' },
+        { title: 'Дата', dataIndex: 'date', width: 100, align: 'right', defaultSortOrder: 'ascend', sorter: {
+            compare: (a, b) => a.dateTimestamp - b.dateTimestamp
+        } },
         { title: 'Номер таска', dataIndex: 'keyTask', width: 120, align: 'right' },
         { title: 'Время начала', dataIndex: 'timeStart', width: 150, align: 'right' },
         { title: 'Время конца', dataIndex: 'timeEnd', width: 150, align: 'right' },

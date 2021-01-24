@@ -14,6 +14,8 @@ export interface IDiaryItem extends IDiaryItemNew {
 export interface IDiaryItemView extends IDiaryItem {
     /** Формат: дд.мм.гггг */
     date: string,
+    /** таймстамп даты для сортировки и фильтрации */
+    dateTimestamp: number,
     /** Формат: чч:мм */
     timeStart: string,
     /** Формат: чч:мм */

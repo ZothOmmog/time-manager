@@ -1,4 +1,4 @@
-import { differenceInMinutes, format } from "date-fns";
+import { differenceInMinutes, format, startOfDay } from "date-fns";
 import { IDiaryItem, IDiaryItemView } from "../models/diary/diary-types";
 import { minutesToStr } from "./minutes-to-str";
 
@@ -8,6 +8,7 @@ const timeFormatter = (timeStr: string) => format(new Date(timeStr), 'HH:mm');
 export const diaryItemToView = (diaryItem: IDiaryItem): IDiaryItemView => ({
     key: diaryItem.key,
     date: dateFormatter(diaryItem.timeEnd),
+    dateTimestamp: new Date(startOfDay(new Date(diaryItem.timeEnd))).getTime(),
     keyTask: diaryItem.keyTask,
     timeStart: timeFormatter(diaryItem.timeStart),
     timeEnd: timeFormatter(diaryItem.timeEnd),
