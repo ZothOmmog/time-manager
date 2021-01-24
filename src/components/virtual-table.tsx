@@ -146,7 +146,7 @@ interface ICustomRowProps<RecordType> {
 }
 
 function CustomRecord<RecordType>({ record, columns, recordStyle, cellStyle }: ICustomRowProps<RecordType>) {
-    const recordKeys = Object.getOwnPropertyNames(record).filter(key => key !== 'key');
+    const recordKeys = (columns as ColumnType<RecordType>[]).map(column => column.dataIndex as string);
     
     return (
         <div style={{...recordStyle, display: 'flex'}} key={Object.getOwnPropertyDescriptor(record, 'key')?.value}>
