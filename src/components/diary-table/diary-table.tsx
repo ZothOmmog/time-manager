@@ -1,9 +1,10 @@
 import { ColumnsType } from 'antd/lib/table';
 import { useStore } from 'effector-react';
 import React, { useMemo } from 'react';
-import { $diaryItemView } from '../models/diary/diary-model';
-import { IDiaryItemView } from '../models/diary/diary-types';
-import { VirtualTable } from './virtual-table';
+import { $diaryItemView } from '../../models/diary/diary-model';
+import { IDiaryItemView } from '../../models/diary/diary-types';
+import { VirtualTable } from '../virtual-table';
+import styles from './diary-table.module.css';
 
 export const DiaryTable = () => {
     const diaryItemsView = useStore($diaryItemView);
@@ -25,6 +26,7 @@ export const DiaryTable = () => {
             dataSource={diaryItemsView}
             tableHeight='calc(100vh - 213px)'
             initialScroll='bottom'
+            rowClassName={styles['row']}
             cellStyle={{ border: '1px solid #f0f0f0', padding: 5 }}
         />
     );

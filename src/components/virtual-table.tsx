@@ -10,6 +10,7 @@ type ScrollType = 'top' | 'bottom';
 
 interface IVirtualTableProps<RecordType> extends TableProps<RecordType> {
     cellStyle?: React.CSSProperties,
+    rowClassName?: string,
     tableHeight: number | string,
     columns: ColumnsType<RecordType>,
     initialScroll?: ScrollType
@@ -18,7 +19,7 @@ interface IVirtualTableProps<RecordType> extends TableProps<RecordType> {
 type IVirtualTable = <RecordType extends object = any>(props: IVirtualTableProps<RecordType>) => JSX.Element;
 
 export const VirtualTable: IVirtualTable = (props) => {
-    const { columns, initialScroll = 'top', cellStyle, tableHeight, style, ...otherProps } = props;
+    const { columns, initialScroll = 'top', cellStyle, tableHeight, style, rowClassName, ...otherProps } = props;
     const [tableWidthAbs, setTableWidthAbs] = useState(0);
     const [tableHeightAbs, setTableHeightAbs] = useState(0);
 
@@ -57,6 +58,7 @@ export const VirtualTable: IVirtualTable = (props) => {
                                 columns={mergedColumns}
                                 cellStyle={props.cellStyle}
                                 rawData={rawData}
+                                rowClassName={rowClassName}
                                 scrollbarSize={scrollbarSize}
                                 tableHeight={tableHeightAbs}
                                 tableWidth={tableWidthAbs}
@@ -77,6 +79,7 @@ interface ICustomBodyProps<RecordType> {
     tableHeight: number,
     tableWidth: number,
     cellStyle?: React.CSSProperties,
+    rowClassName?: string,
     initialScroll: ScrollType
 }
 
@@ -87,7 +90,8 @@ function CustomBody<RecordType extends object = any>({
     tableHeight,
     tableWidth,
     cellStyle,
-    initialScroll
+    initialScroll,
+    rowClassName
 }: ICustomBodyProps<RecordType>) {
     const totalHeight = rawData.length * ROW_HEIGHT;
     const [isInitScroll, setIsInitScroll] = useState(false);
@@ -132,6 +136,7 @@ function CustomBody<RecordType extends object = any>({
                     recordStyle={style}
                     cellStyle={cellStyle}
                     columns={columnNormalizeWidth}
+                    recordClassName={rowClassName}
                 />
             )}
         </List>
@@ -142,14 +147,15 @@ interface ICustomRowProps<RecordType> {
     record: RecordType,
     recordStyle: React.CSSProperties,
     columns: ColumnsType<RecordType>,
-    cellStyle?: React.CSSProperties
+    cellStyle?: React.CSSProperties,
+    recordClassName?: string
 }
 
-function CustomRecord<RecordType>({ record, columns, recordStyle, cellStyle }: ICustomRowProps<RecordType>) {
+function CustomRecord<RecordType>({ record, columns, recordStyle, cellStyle, recordClassName }: ICustomRowProps<RecordType>) {
     const recordKeys = (columns as ColumnType<RecordType>[]).map(column => column.dataIndex as string);
     
     return (
-        <div style={{...recordStyle, display: 'flex'}} key={Object.getOwnPropertyDescriptor(record, 'key')?.value}>
+        <div className={recordClassName} style={{...recordStyle, display: 'flex'}} key={Object.getOwnPropertyDescriptor(record, 'key')?.value}>
             {recordKeys.map(key => (
                 <CustomCell
                     key={key}
