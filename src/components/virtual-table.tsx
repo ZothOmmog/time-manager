@@ -1,5 +1,5 @@
-import React, { useState, useEffect, useRef } from 'react';
-import { VariableSizeGrid as Grid, VariableSizeGrid } from 'react-window';
+import React, { useState, useEffect, useRef, useMemo } from 'react';
+import { VariableSizeList as List } from 'react-window';
 import ResizeObserver from 'rc-resize-observer';
 import { Table } from 'antd';
 import { ColumnsType, ColumnType, TableProps } from 'antd/lib/table';
@@ -86,67 +86,85 @@ function CustomBody<RecordType extends object = any>({
 }: ICustomBodyProps<RecordType>) {
     const totalHeight = rawData.length * ROW_HEIGHT;
 
-    const gridRef = useRef<VariableSizeGrid>(null);
+    const gridRef = useRef<List>(null);
 
     useEffect(() => {
-        gridRef.current?.resetAfterIndices({
-            columnIndex: 0,
-            rowIndex: 0,
-            shouldForceUpdate: false
-        });
+        gridRef.current?.resetAfterIndex(0, false);
     }, [tableWidth, tableHeight]);
 
-    return (
-        <Grid
-            ref={gridRef}
-            className='virtual-grid'
-            columnCount={columns.length}
-            columnWidth={(index: number) => {
-                const { width } = columns[index];
+    const columnNormalizeWidth = useMemo<ColumnsType<RecordType>>(() => {
+        return columns.map((column, index, columns) => {
+                const { width } = column;
+
                 return totalHeight > tableHeight && index === columns.length - 1
-                    ? (width as number) - scrollbarSize
-                    : (width as number);
-            }}
-            rowCount={rawData.length}
-            rowHeight={() => ROW_HEIGHT}
+                    ? { ...column, width: (width as number) - scrollbarSize}
+                    : column;
+            })
+    }, [totalHeight, columns, scrollbarSize, tableHeight]);
+
+    return (
+        <List
+            ref={gridRef}
+            itemCount={rawData.length}
+            itemSize={() => ROW_HEIGHT}
             width={tableWidth}
             height={tableHeight}
-            onScroll={({ scrollLeft }: { scrollLeft: number }) => {
-                onScroll({ scrollLeft });
-            }}
         >
-            {({
-                columnIndex,
-                rowIndex,
-                style,
-            }: {
-                columnIndex: number;
-                rowIndex: number;
-                style: React.CSSProperties;
-            }) => {
-                const row = rawData[rowIndex];
-
-                const columnInfo = columns[columnIndex] as ColumnType<RecordType>;
-                const cellName = columnInfo.dataIndex as string;
-
-                const cellData = Object.getOwnPropertyDescriptor(row, cellName)?.value;
-                
-                if (!cellData) {
-                    throw Error(`Не удалось найти свойство ${cellName} в строке с индексом ${rowIndex} при отрисовке компонента VirtualTable`);
-                }
-
-                return (
-                    <div
-                        style={{
-                            ...style,
-                            ...cellStyle,
-                            textAlign: columnInfo.align
-                        }}
-                    >
-                        {cellData}
-                    </div>
-                );
-            }}
-        </Grid>
+            {({ index, style }) => (
+                <CustomRecord
+                    record={rawData[index]}
+                    recordStyle={style}
+                    cellStyle={cellStyle}
+                    columns={columnNormalizeWidth}
+                />
+            )}
+        </List>
     );
 }
+
+interface ICustomRowProps<RecordType> {
+    record: RecordType,
+    recordStyle: React.CSSProperties,
+    columns: ColumnsType<RecordType>,
+    cellStyle?: React.CSSProperties
+}
+
+function CustomRecord<RecordType>({ record, columns, recordStyle, cellStyle }: ICustomRowProps<RecordType>) {
+    const recordKeys = Object.getOwnPropertyNames(record).filter(key => key !== 'key');
+    
+    return (
+        <div style={{...recordStyle, display: 'flex'}} key={Object.getOwnPropertyDescriptor(record, 'key')?.value}>
+            {recordKeys.map(key => (
+                <CustomCell
+                    cellData={Object.getOwnPropertyDescriptor(record, key)?.value as React.ReactNode}
+                    cellStyle={cellStyle}
+                    columnInfo={(columns as ColumnType<RecordType>[]).find(column => column.dataIndex === key)!}
+                />
+            ))}
+        </div>
+    );
+}
+
+interface ICustomCellProps<RecordType> {
+    cellData: React.ReactNode,
+    cellStyle?: React.CSSProperties,
+    columnInfo: ColumnType<RecordType>
+}
+
+function CustomCell<RecordType>({
+    cellData,
+    cellStyle,
+    columnInfo,
+}: ICustomCellProps<RecordType>) {
+    return (
+        <div
+            style={{
+                ...cellStyle,
+                textAlign: columnInfo.align,
+                width: columnInfo.width
+            }}
+        >
+            {cellData}
+        </div>
+    );
+};
