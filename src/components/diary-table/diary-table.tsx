@@ -35,6 +35,9 @@ export const DiaryTable = () => {
                 scrollToItem(diaryItemsView.length - 1);
                 scrollTableToBottom();
             }}
+            onRow={record => {
+                console.log(record);
+            }}
         />
     );
 };

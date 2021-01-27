@@ -8,19 +8,20 @@ const ROW_HEIGHT = 54;
 
 type ScrollType = 'top' | 'bottom';
 
-interface IVirtualTableProps<RecordType> extends TableProps<RecordType> {
+interface IVirtualTableProps<RecordType> extends Omit<TableProps<RecordType>, 'onRow'> {
     cellStyle?: React.CSSProperties,
     rowClassName?: string,
     tableHeight: number | string,
     columns: ColumnsType<RecordType>,
     initialScroll?: ScrollType,
-    scrollToItemReceiver?: (scrollToItem: List['scrollToItem']) => void
+    scrollToItemReceiver?: (scrollToItem: List['scrollToItem']) => void,
+    onRow?: (record: RecordType) => void
 }
 
 type IVirtualTable = <RecordType extends object = any>(props: IVirtualTableProps<RecordType>) => JSX.Element;
 
 export const VirtualTable: IVirtualTable = (props) => {
-    const { columns, initialScroll = 'top', cellStyle, tableHeight, style, rowClassName, scrollToItemReceiver, ...otherProps } = props;
+    const { columns, initialScroll = 'top', cellStyle, tableHeight, style, rowClassName, scrollToItemReceiver, onRow, ...otherProps } = props;
     const [tableWidthAbs, setTableWidthAbs] = useState(0);
     const [tableHeightAbs, setTableHeightAbs] = useState(0);
 
@@ -65,6 +66,7 @@ export const VirtualTable: IVirtualTable = (props) => {
                                 tableHeight={tableHeightAbs}
                                 tableWidth={tableWidthAbs}
                                 initialScroll={initialScroll}
+                                onRow={onRow}
                             />
                         ) : null
                     )
@@ -83,7 +85,8 @@ interface ICustomBodyProps<RecordType> {
     cellStyle?: React.CSSProperties,
     rowClassName?: string,
     scrollToItemReceiver?: (scrollToItem: List['scrollToItem']) => void,
-    initialScroll: ScrollType
+    initialScroll: ScrollType,
+    onRow?: (record: RecordType) => void
 }
 
 function CustomBody<RecordType extends object = any>({
@@ -95,7 +98,8 @@ function CustomBody<RecordType extends object = any>({
     cellStyle,
     initialScroll,
     rowClassName,
-    scrollToItemReceiver
+    scrollToItemReceiver,
+    onRow
 }: ICustomBodyProps<RecordType>) {
     const totalHeight = rawData.length * ROW_HEIGHT;
     const [isInitScroll, setIsInitScroll] = useState(false);
@@ -147,6 +151,7 @@ function CustomBody<RecordType extends object = any>({
                     cellStyle={cellStyle}
                     columns={columnNormalizeWidth}
                     recordClassName={rowClassName}
+                    onClick={onRow}
                 />
             )}
         </List>
@@ -158,14 +163,22 @@ interface ICustomRowProps<RecordType> {
     recordStyle: React.CSSProperties,
     columns: ColumnsType<RecordType>,
     cellStyle?: React.CSSProperties,
-    recordClassName?: string
+    recordClassName?: string,
+    onClick?: (record: RecordType) => void
 }
 
-function CustomRecord<RecordType>({ record, columns, recordStyle, cellStyle, recordClassName }: ICustomRowProps<RecordType>) {
+function CustomRecord<RecordType>({ record, columns, recordStyle, cellStyle, recordClassName, onClick }: ICustomRowProps<RecordType>) {
     const recordKeys = (columns as ColumnType<RecordType>[]).map(column => column.dataIndex as string);
     
     return (
-        <div className={recordClassName} style={{...recordStyle, display: 'flex'}} key={Object.getOwnPropertyDescriptor(record, 'key')?.value}>
+        <div
+            className={recordClassName}
+            style={{...recordStyle, display: 'flex'}}
+            key={Object.getOwnPropertyDescriptor(record, 'key')?.value}
+            onClick={() => {
+                if (onClick) onClick(record);
+            }}
+        >
             {recordKeys.map(key => (
                 <CustomCell
                     key={key}
