@@ -51,11 +51,11 @@ sample({
 sample({
     source: createEditForm.formValidated,
     target: addDiaryItemFx,
-    fn: ({ description, endTime, keyTask, startTime }) => ({
-        desctiption: description,
+    fn: ({ description, timeStart, keyTask, timeEnd }) => ({
+        description,
         keyTask: Number(keyTask),
-        timeEnd: endTime,
-        timeStart: startTime
+        timeEnd,
+        timeStart
     })
 });
 

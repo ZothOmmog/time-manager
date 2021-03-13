@@ -12,7 +12,7 @@ export const createEditForm = createForm({
                 rules.number()
             ]
         },
-        startTime: {
+        timeStart: {
             init: '0',
             rules: [
                 rules.required(),
@@ -25,7 +25,7 @@ export const createEditForm = createForm({
                 }
             ]
         },
-        endTime: {
+        timeEnd: {
             init: '0',
             rules: [
                 rules.required(),

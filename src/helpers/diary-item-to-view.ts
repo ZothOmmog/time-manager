@@ -20,5 +20,5 @@ export const diaryItemToView = (diaryItem: IDiaryItem): IDiaryItemView => ({
             new Date(diaryItem.timeStart)
         )
     ),
-    desctiption: diaryItem.desctiption
+    description: diaryItem.description
 });

@@ -49,8 +49,14 @@ const getAll = async () => {
         const request = todosTable.getAll();
         request.onsuccess = () => {
             if (request.result === undefined) resolve([]);
-            else resolve(request.result);
-        };
+            else
+                resolve(
+                    request.result.map(({ desctiption, ...other }) => ({
+                        description: desctiption,
+                        ...other,
+                    }))
+                ); //TODO убрать после нормализации данных
+        };;
     });
 }
 

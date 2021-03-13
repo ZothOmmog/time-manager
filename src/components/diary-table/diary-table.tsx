@@ -18,7 +18,7 @@ export const DiaryTable = () => {
         { title: 'Время начала', dataIndex: 'timeStart', width: 150, align: 'right' },
         { title: 'Время конца', dataIndex: 'timeEnd', width: 150, align: 'right' },
         { title: 'Продолжительность', dataIndex: 'duration', width: 180, align: 'right' },
-        { title: 'Описание', dataIndex: 'desctiption' }
+        { title: 'Описание', dataIndex: 'description' }
     ], []);
 
     return (

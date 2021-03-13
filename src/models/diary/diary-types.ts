@@ -4,7 +4,7 @@ export interface IDiaryItemNew {
     /** Формат: UTCString */
     timeEnd: string,
     keyTask: number,
-    desctiption: string
+    description: string
 }
 
 export interface IDiaryItem extends IDiaryItemNew {
