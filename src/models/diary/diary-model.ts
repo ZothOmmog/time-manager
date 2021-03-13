@@ -1,10 +1,10 @@
 import { createEffect, createEvent, createStore } from "effector";
 import { diaryItemToView } from "../../helpers/diary-item-to-view";
-import { IDiaryItem, IDiaryItemNew, IDiaryItemView } from "./diary-types";
+import { IDiaryItem, IDiaryItemView } from "./diary-types";
 
 export const fetchDiaryItemsFx = createEffect<void, IDiaryItem[]>();
-export const addDiaryItemFx = createEffect<IDiaryItemNew, IDiaryItem[]>();
 
+export const receiveDiaryItems = createEvent<IDiaryItem[]>();
 export const scrollTableToBottom = createEvent();
 export const setScrollTableToBottom = createEvent();
 

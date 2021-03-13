@@ -1,6 +1,5 @@
-import React from 'react';
+import React, { useMemo } from 'react';
 import { Modal, Input, Button, Typography, Row, Col } from 'antd';
-import { visibleChange } from '../../models/diary-item-create-edit-form/diary-item-create-edit-form-model';
 import { InputProps } from 'antd/lib/input';
 import DatePicker from '../date-picker';
 import { IDiaryItemNew } from '../../models/diary/diary-types';
@@ -15,8 +14,8 @@ type DiaryItemCreateEditFormProps = {
         [K in keyof IDiaryItemNew]: {
             value: string;
             onChange: (value: string) => void;
-            hasError: () => boolean;
-            errorText: () => string;
+            hasError: boolean;
+            errorText: string;
         };
     };
     submit: () => void;
@@ -38,12 +37,17 @@ export const DiaryItemCreateEditForm = (props: DiaryItemCreateEditFormProps) => 
             break;
         }
         default: {
-            modalTitle = '';
-            createEditButtonText = '';
-            break;
+            throw new Error('Неизвестный тип формы: ' + props.visibleType);
         }
     }
 
+    const descriptionAutoSize = useMemo(
+        () => ({
+            minRows: 5,
+            maxRows: 5,
+        }),
+        []
+    );
     return (
         <Modal
             visible={props.isVisible}
@@ -53,7 +57,7 @@ export const DiaryItemCreateEditForm = (props: DiaryItemCreateEditFormProps) => 
             bodyStyle={{ height: 360 }}
             footer={
                 <>
-                    <Button onClick={() => visibleChange('')}>Отмена</Button>
+                    <Button onClick={() => props.onClose()}>Отмена</Button>
                     <Button type='primary' onClick={props.submit}>
                         {createEditButtonText}
                     </Button>
@@ -73,10 +77,7 @@ export const DiaryItemCreateEditForm = (props: DiaryItemCreateEditFormProps) => 
             </Row>
             Описание:
             <FormInputTextarea
-                autoSize={{
-                    minRows: 5,
-                    maxRows: 5,
-                }}
+                autoSize={descriptionAutoSize}
                 showCount
                 allowClear
                 maxLength={320}
@@ -86,101 +87,35 @@ export const DiaryItemCreateEditForm = (props: DiaryItemCreateEditFormProps) => 
     );
 }
 
-// type KeyTaskInput
-
-// function KeyTaskInput() {
-//     const { value, onChange, hasError, errorText } = useField(createEditForm.fields.keyTask);
-    
-//     return (
-//         <FormInput
-//             addonBefore='Номер таска'
-//             errorText={errorText()}
-//             hasError={hasError()}
-//             value={value}
-//             onChange={onChange}
-//         />
-//     )
-// }
-
-// function StartTimeInput() {
-//     const { value, onChange, hasError, errorText } = useField(createEditForm.fields.startTime);
-    
-//     return (
-//         <FormInputTimePicker
-//             format='HH:mm'
-//             placeholder='ЧЧ:ММ'
-//             errorText={errorText()}
-//             hasError={hasError()}
-//             value={value}
-//             onChange={onChange}
-//         />
-//     );
-// }
-
-// function EndTimeInput() {
-//     const { value, onChange, hasError, errorText } = useField(createEditForm.fields.endTime);
-    
-//     return (
-//         <FormInputTimePicker
-//             format='HH:mm'
-//             placeholder='ЧЧ:ММ'
-//             errorText={errorText()}
-//             hasError={hasError()}
-//             value={value}
-//             onChange={onChange}
-//         />
-//     );
-// }
-
-// function DescriptionInput() {
-//     const { value, onChange, hasError, errorText } = useField(createEditForm.fields.description);
-    
-//     return (
-//         <FormInputTextarea
-//             autoSize={{
-//                 minRows: 5,
-//                 maxRows: 5
-//             }}
-//             showCount
-//             allowClear
-//             maxLength={320}
-//             errorText={errorText()}
-//             hasError={hasError()}
-//             value={value}
-//             onChange={onChange}
-//         />
-//     )
-// }
-
 interface IFormInputProps extends Omit<InputProps, 'onChange'> {
-    errorText: () => string;
-    hasError: () => boolean;
+    errorText: string;
+    hasError: boolean;
     onChange: (value: string) => void;
 }
 
-function FormInput(props: IFormInputProps) {
+const FormInput = React.memo((props: IFormInputProps) => {
     const { onChange, errorText, hasError, ...otherProps } = props;
     return (
-        <div style={{ height: 54 }} className={hasError() ? 'ant-form-item-has-error' : ''}>
+        <div style={{ height: 54 }} className={hasError ? 'ant-form-item-has-error' : ''}>
             <Input {...otherProps} onChange={(e) => onChange(e.target.value)} />
             <Text type='danger'>
-                {props.errorText()}
+                {props.errorText}
             </Text>
         </div>
     );
-}
+});
 
 interface IFormInputTimePickerProps extends Omit<Omit<React.ComponentProps<typeof TimePicker>, 'onChange'>, 'value'> {
-    errorText: () => string,
-    hasError: () => boolean,
+    errorText: string,
+    hasError: boolean,
     onChange: (value: string) => void,
     value: string
 }
 
-function FormInputTimePicker(props: IFormInputTimePickerProps) {
+const FormInputTimePicker = React.memo((props: IFormInputTimePickerProps) => {
     const { errorText, hasError, onChange, value, ...otherProps } = props;
     return (
-        <div style={{ height: 54 }} className={hasError() ? 'ant-form-item-has-error' : ''}>
+        <div style={{ height: 54 }} className={hasError ? 'ant-form-item-has-error' : ''}>
             <TimePicker
                 {...otherProps}
                 value={value ? new Date(value) : null}
@@ -188,20 +123,20 @@ function FormInputTimePicker(props: IFormInputTimePickerProps) {
             />
             <div>
                 <Text type='danger'>
-                    {props.errorText()}
+                    {props.errorText}
                 </Text>
             </div>
         </div>
     );
-}
+});
 
 interface IFormInputTextareaProps extends Omit<React.ComponentProps<typeof Input.TextArea>, 'onChange'> {
-    errorText: () => string,
-    hasError: () => boolean,
+    errorText: string,
+    hasError: boolean,
     onChange: (value: string) => void;
 }
 
-function FormInputTextarea(props: IFormInputTextareaProps) {
+const FormInputTextarea = React.memo((props: IFormInputTextareaProps) => {
     const { onChange, errorText, hasError, ...otherProps } = props;
 
     let errorStyle: React.CSSProperties;
@@ -215,11 +150,11 @@ function FormInputTextarea(props: IFormInputTextareaProps) {
     else errorStyle = {};
 
     return (
-        <div style={{ height: 54 }} className={hasError() ? 'ant-form-item-has-error' : ''}>
+        <div style={{ height: 54 }} className={hasError ? 'ant-form-item-has-error' : ''}>
             <Input.TextArea {...otherProps} onChange={(e) => onChange(e.target.value)} />
             <Text type='danger' style={errorStyle} >
-                {props.errorText()}
+                {props.errorText}
             </Text>
         </div>
     );
-}
+});
