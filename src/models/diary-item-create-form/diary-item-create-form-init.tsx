@@ -2,6 +2,7 @@ import { addHours, startOfDay, startOfMinute } from 'date-fns';
 import { forward, sample } from 'effector';
 import { diaryApi } from '../../api/dairy-api';
 import { $diaryItemView, receiveDiaryItems } from '../diary/diary-model';
+import { IDiaryItemView } from '../diary/diary-types';
 import {
     $isOpenCreateForm,
     closeCreateForm,
@@ -20,32 +21,50 @@ sample({
     clock: openCreateForm,
     target: createForm.setForm,
     fn: (diaryItemViewArr) => {
-        const diaryItemLatest = diaryItemViewArr.reduce((latest, diaryItem) =>
-            latest.timeStartTimestamp > diaryItem.timeStartTimestamp ? latest : diaryItem
-        );
+        let initValues;
 
-        let timeStart;
-        let timeEnd;
-
-        if (diaryItemLatest.dateTimestamp === startOfDay(new Date()).getTime()) {
-            timeStart = startOfMinute(new Date(diaryItemLatest.timeEndTimestamp)).toUTCString();
-            timeEnd = addHours(
-                startOfMinute(new Date(diaryItemLatest.timeEndTimestamp)),
-                2
-            ).toUTCString();
-        } else {
-            timeStart = startOfMinute(new Date()).toUTCString();
-            timeEnd = addHours(startOfMinute(new Date()), 2).toUTCString();
+        if (diaryItemViewArr.length === 0) {
+            initValues = {
+                keyTask: '',
+                timeStart: startOfMinute(new Date()).toUTCString(),
+                timeEnd: addHours(startOfMinute(new Date()), 2).toUTCString(),
+                description: 'Начал работу',
+            };
+        }
+        else {
+            initValues = getInitForDataExist(diaryItemViewArr);
         }
 
-        return {
-            keyTask: diaryItemLatest.keyTask.toString(),
-            timeStart,
-            timeEnd,
-            description: 'Продолжил работу',
-        };
+        return initValues;
     },
 });
+
+const getInitForDataExist = (diaryItemViewArr: IDiaryItemView[]) => {
+    const diaryItemLatest = diaryItemViewArr.reduce((latest, diaryItem) =>
+        latest.timeStartTimestamp > diaryItem.timeStartTimestamp ? latest : diaryItem
+    );
+
+    let timeStart;
+    let timeEnd;
+
+    if (diaryItemLatest.dateTimestamp === startOfDay(new Date()).getTime()) {
+        timeStart = startOfMinute(new Date(diaryItemLatest.timeEndTimestamp)).toUTCString();
+        timeEnd = addHours(
+            startOfMinute(new Date(diaryItemLatest.timeEndTimestamp)),
+            2
+        ).toUTCString();
+    } else {
+        timeStart = startOfMinute(new Date()).toUTCString();
+        timeEnd = addHours(startOfMinute(new Date()), 2).toUTCString();
+    }
+
+    return {
+        keyTask: diaryItemLatest.keyTask.toString(),
+        timeStart,
+        timeEnd,
+        description: 'Продолжил работу',
+    };
+};
 
 sample({
     source: createForm.formValidated,
