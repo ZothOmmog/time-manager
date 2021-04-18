@@ -18,20 +18,20 @@ export const PageTemplate: React.FC<unknown> = ({ children }) => {
     
     return (
         <Layout>
-            <Header>
-                <Menu
-                    theme='dark'
-                    mode='horizontal'
-                    defaultSelectedKeys={[pathname]}
-                    onSelect={({ key }) => history.push(key as string)}
-                >
-                    <Menu.Item key="/">Ежедневник</Menu.Item>
-                    <Menu.Item key="/tasks">Детально по таскам</Menu.Item>
-                    <Menu.Item key="/time">Детально по времени</Menu.Item>
-                </Menu>
-            </Header>
+            {sider}
             <Layout>
-                {sider}
+                <Header>
+                    <Menu
+                        theme='dark'
+                        mode='horizontal'
+                        defaultSelectedKeys={[pathname]}
+                        onSelect={({ key }) => history.push(key as string)}
+                    >
+                        <Menu.Item key="/">Ежедневник</Menu.Item>
+                        <Menu.Item key="/tasks">Детально по таскам</Menu.Item>
+                        <Menu.Item key="/time">Детально по времени</Menu.Item>
+                    </Menu>
+                </Header>
                 <Content style={{
                     margin: '32px',
                     padding: '16px',
