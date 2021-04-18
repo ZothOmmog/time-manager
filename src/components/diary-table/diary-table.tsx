@@ -11,12 +11,12 @@ export const DiaryTable = () => {
     const scrollTableToBottomNeed = useStore($scrollTableToBottomNeed);
 
     const columns = useMemo<ColumnsType<IDiaryItemView>>(() => [
-        { title: 'Дата', dataIndex: 'date', width: 100, align: 'right', defaultSortOrder: 'ascend', sorter: {
+        { title: 'Дата', dataIndex: 'date', width: 80, align: 'right', defaultSortOrder: 'ascend', sorter: {
             compare: (a, b) => a.dateTimestamp - b.dateTimestamp
         } },
         { title: 'Номер таска', dataIndex: 'keyTask', width: 120, align: 'right' },
-        { title: 'Время начала', dataIndex: 'timeStart', width: 150, align: 'right' },
-        { title: 'Время конца', dataIndex: 'timeEnd', width: 150, align: 'right' },
+        { title: 'Время начала', dataIndex: 'timeStart', width: 125, align: 'right' },
+        { title: 'Время конца', dataIndex: 'timeEnd', width: 125, align: 'right' },
         { title: 'Продолжительность', dataIndex: 'duration', width: 180, align: 'right' },
         { title: 'Описание', dataIndex: 'description' }
     ], []);
@@ -26,6 +26,9 @@ export const DiaryTable = () => {
             columns={columns}
             dataSource={diaryItemsView}
             tableHeight='calc(100vh - 267px)'
+            style={{
+                minWidth: 700
+            }}
             initialScroll='bottom'
             rowClassName={styles['row']}
             cellStyle={{ border: '1px solid #f0f0f0', padding: 5 }}
